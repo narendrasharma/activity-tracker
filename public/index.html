@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activity Tracker | Audit System</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f3f9;
+      font-size: 0.875rem;
+    }
+
+    code, .font-mono {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #1e293b !important;
+      border-bottom: 3px solid #3b82f6;
+      padding: 0.6rem 1.5rem;
+    }
+
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #f8fafc !important;
+      letter-spacing: -0.01em;
+    }
+
+    .navbar-brand span {
+      color: #3b82f6;
+    }
+
+    .navbar .badge-env {
+      font-size: 0.65rem;
+      background: #3b82f6;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      vertical-align: middle;
+    }
+
+    .navbar-text {
+      color: #94a3b8 !important;
+      font-size: 0.78rem;
+    }
+
+    /* Stat cards */
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+      border-left: 4px solid transparent;
+    }
+
+    .stat-card.border-primary  { border-left-color: #3b82f6; }
+    .stat-card.border-danger   { border-left-color: #ef4444; }
+    .stat-card.border-success  { border-left-color: #22c55e; }
+    .stat-card.border-warning  { border-left-color: #f59e0b; }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Pills nav */
+    .nav-pills .nav-link {
+      color: #475569;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-pills .nav-link:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .nav-pills .nav-link.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    /* Card overrides */
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .card-header {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.85rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #1e293b;
+      border-radius: 8px 8px 0 0 !important;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-header .card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    /* Table */
+    .table {
+      font-size: 0.8rem;
+      margin-bottom: 0;
+    }
+
+    .table thead th {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      font-weight: 600;
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 0.6rem 0.85rem;
+      white-space: nowrap;
+    }
+
+    .table tbody td {
+      padding: 0.6rem 0.85rem;
+      vertical-align: middle;
+      border-color: #f1f5f9;
+      color: #334155;
+    }
+
+    .table tbody tr:hover td {
+      background: #f8fafc;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges / pills */
+    .badge {
+      font-weight: 500;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .badge-user   { background: #dbeafe; color: #1d4ed8; }
+    .badge-action { background: #dcfce7; color: #15803d; }
+    .badge-ip     { background: #f1f5f9; color: #475569; font-family: 'Fira Code', monospace; }
+    .badge-warn   { background: #fef3c7; color: #b45309; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+
+    /* Filter row */
+    .filter-bar {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-bar label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .form-control, .form-select {
+      font-size: 0.8rem;
+      border-color: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+
+    /* Anomaly cards */
+    .anomaly-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .anomaly-item:last-child { margin-bottom: 0; }
+
+    /* Top users progress */
+    .user-row { margin-bottom: 1rem; }
+    .user-row:last-child { margin-bottom: 0; }
+
+    .user-row .label-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 0.8rem;
+    }
+
+    .user-row .rank {
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin-right: 6px;
+    }
+
+    .progress {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 99px;
+    }
+
+    /* Pagination */
+    .pagination {
+      margin-bottom: 0;
+    }
+
+    .page-link {
+      font-size: 0.78rem;
+      color: #475569;
+      border-color: #e2e8f0;
+      padding: 0.3rem 0.65rem;
+    }
+
+    .page-item.active .page-link {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .page-item.disabled .page-link {
+      color: #cbd5e1;
+    }
+
+    /* Empty / loading states */
+    .state-box {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: #94a3b8;
+      font-size: 0.82rem;
+    }
+
+    .state-box i {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      opacity: 0.4;
+    }
+
+    /* Metadata cell */
+    .meta-cell {
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      cursor: help;
+    }
+
+    /* Section tab content */
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+
+    /* Toast */
+    #toastContainer {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      min-width: 260px;
+    }
+
+    .rules-bar {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 0.6rem 1rem;
+      font-size: 0.78rem;
+      color: #1e40af;
+      margin-bottom: 1rem;
+    }
+
+    .id-cell { color: #94a3b8; font-family: 'Fira Code', monospace; font-size: 0.72rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ───────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <i class="bi bi-activity me-2"></i>ActivityTracker
+      <span class="badge-env ms-2">AUDIT</span>
+    </a>
+    <span class="navbar-text ms-auto">
+      <i class="bi bi-circle-fill text-success me-1" style="font-size:0.5rem;vertical-align:middle;"></i>
+      System Online
+    </span>
+  </div>
+</nav>
+
+<!-- ── Main content ─────────────────────────────────────────────────────── -->
+<div class="container-fluid px-4 py-4" style="max-width:1400px;">
+
+  <!-- Stat cards row -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-primary">
+        <div class="stat-label"><i class="bi bi-list-ul me-1"></i>Total Logs</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-sub">in current filter</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-danger">
+        <div class="stat-label"><i class="bi bi-lightning-fill me-1"></i>High Frequency</div>
+        <div class="stat-value" id="stat-hf">—</div>
+        <div class="stat-sub">anomalies detected</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-success">
+        <div class="stat-label"><i class="bi bi-globe me-1"></i>Multi-IP</div>
+        <div class="stat-value" id="stat-mip">—</div>
+        <div class="stat-sub">anomalies detected</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-warning">
+        <div class="stat-label"><i class="bi bi-person-fill me-1"></i>Top User</div>
+        <div class="stat-value" id="stat-topuser">—</div>
+        <div class="stat-sub">most active user ID</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pills navigation -->
+  <ul class="nav nav-pills mb-3 gap-1" id="mainNav">
+    <li class="nav-item">
+      <a class="nav-link active" href="#" data-section="logs">
+        <i class="bi bi-journal-text"></i> Activity Logs
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" data-section="anomalies">
+        <i class="bi bi-exclamation-triangle"></i> Anomalies
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" data-section="top-users">
+        <i class="bi bi-bar-chart-line"></i> Top Users
+      </a>
+    </li>
+  </ul>
+
+  <!-- ── LOGS SECTION ──────────────────────────────────────────────────── -->
+  <div class="tab-section active" id="section-logs">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon bg-primary bg-opacity-10 text-primary">
+          <i class="bi bi-table"></i>
+        </div>
+        Activity Logs
+        <div class="ms-auto d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" id="btnExport">
+            <i class="bi bi-download me-1"></i>Export CSV
+          </button>
+          <button class="btn btn-sm btn-primary" id="btnRefreshLogs">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="row g-2 align-items-end">
+            <div class="col-6 col-md-2">
+              <label>User ID</label>
+              <input type="number" class="form-control form-control-sm" id="f-user_id" placeholder="e.g. 42" />
+            </div>
+            <div class="col-6 col-md-2">
+              <label>Action</label>
+              <input type="text" class="form-control form-control-sm" id="f-action" placeholder="e.g. login" />
+            </div>
+            <div class="col-6 col-md-2">
+              <label>Date From</label>
+              <input type="date" class="form-control form-control-sm" id="f-date_from" />
+            </div>
+            <div class="col-6 col-md-2">
+              <label>Date To</label>
+              <input type="date" class="form-control form-control-sm" id="f-date_to" />
+            </div>
+            <div class="col-6 col-md-1">
+              <label>Sort</label>
+              <select class="form-select form-select-sm" id="f-sort">
+                <option value="DESC">Newest</option>
+                <option value="ASC">Oldest</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-1">
+              <label>Per page</label>
+              <select class="form-select form-select-sm" id="f-limit">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-2 d-flex gap-2">
+              <button class="btn btn-sm btn-primary flex-fill" id="btnFilter">
+                <i class="bi bi-funnel me-1"></i>Filter
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" id="btnClear">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>IP Address</th>
+                <th>Metadata</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logs-body">
+              <tr>
+                <td colspan="6">
+                  <div class="state-box">
+                    <i class="bi bi-hourglass-split"></i>
+                    Loading logs…
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2" id="logs-pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ANOMALIES SECTION ─────────────────────────────────────────────── -->
+  <div class="tab-section" id="section-anomalies">
+    <div class="row g-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon bg-danger bg-opacity-10 text-danger">
+              <i class="bi bi-shield-exclamation"></i>
+            </div>
+            Anomaly Detection Report
+            <button class="btn btn-sm btn-primary ms-auto" id="btnRefreshAnomalies">
+              <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+          </div>
+          <div class="card-body" id="anomaly-content">
+            <div class="state-box">
+              <i class="bi bi-hourglass-split"></i>
+              Loading anomaly data…
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOP USERS SECTION ─────────────────────────────────────────────── -->
+  <div class="tab-section" id="section-top-users">
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <div class="card-icon bg-warning bg-opacity-10 text-warning">
+              <i class="bi bi-trophy"></i>
+            </div>
+            Top Active Users
+            <span class="ms-2 badge bg-secondary bg-opacity-10 text-secondary" style="font-size:0.65rem;">
+              <i class="bi bi-clock me-1"></i>Cached 2 min
+            </span>
+            <button class="btn btn-sm btn-primary ms-auto" id="btnRefreshTopUsers">
+              <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+          </div>
+          <div class="card-body" id="top-users-content">
+            <div class="state-box">
+              <i class="bi bi-hourglass-split"></i>
+              Loading…
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <div class="card-icon bg-info bg-opacity-10 text-info">
+              <i class="bi bi-info-circle"></i>
+            </div>
+            About This System
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mb-0" style="font-size:0.82rem;line-height:2;">
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>Tracks user activity with IP &amp; user-agent</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>Prepared statements — SQL injection safe</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>Rate limiting: 100 requests / IP / hour</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>File-based cache with 2-minute TTL</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>Anomaly detection: burst &amp; multi-IP</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>Supports 100k+ records with indexing</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i>CSV export for filtered results</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<!-- Bootstrap 5 JS + jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(function () {
+
+  // ── Config ─────────────────────────────────────────────────────────────
+  const BASE = '../api';   // adjust to your server path if needed
+  let currentOffset = 0;
+  let currentLimit  = 50;
+
+  // ── Pills navigation ────────────────────────────────────────────────────
+  $('#mainNav .nav-link').on('click', function (e) {
+    e.preventDefault();
+    $('#mainNav .nav-link').removeClass('active');
+    $(this).addClass('active');
+
+    const section = $(this).data('section');
+    $('.tab-section').removeClass('active');
+    $('#section-' + section).addClass('active');
+
+    if (section === 'anomalies')  fetchAnomalies();
+    if (section === 'top-users')  fetchTopUsers();
+  });
+
+  // ── Toast ───────────────────────────────────────────────────────────────
+  function toast(msg, type) {
+    type = type || 'success';
+    const color = type === 'success' ? 'bg-success' : 'bg-danger';
+    const id = 'toast-' + Date.now();
+    const html = `
+      <div id="${id}" class="toast align-items-center text-white ${color} border-0 mb-2 show" role="alert">
+        <div class="d-flex">
+          <div class="toast-body" style="font-size:0.8rem;">${esc(msg)}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>`;
+    $('#toastContainer').append(html);
+    setTimeout(function () { $('#' + id).remove(); }, 3500);
+  }
+
+  // ── API helper ──────────────────────────────────────────────────────────
+  function apiGet(endpoint, params) {
+    // Strip blank params
+    const clean = {};
+    $.each(params || {}, function (k, v) {
+      if (v !== '' && v !== null && v !== undefined) clean[k] = v;
+    });
+    return $.getJSON(BASE + endpoint, clean);
+  }
+
+  // ── Logs ────────────────────────────────────────────────────────────────
+  function fetchLogs(resetPage) {
+    if (resetPage) currentOffset = 0;
+    currentLimit = parseInt($('#f-limit').val());
+
+    const params = {
+      user_id:   $('#f-user_id').val().trim(),
+      action:    $('#f-action').val().trim(),
+      date_from: $('#f-date_from').val(),
+      date_to:   $('#f-date_to').val(),
+      sort:      $('#f-sort').val(),
+      limit:     currentLimit,
+      offset:    currentOffset,
+    };
+
+    $('#logs-body').html(
+      '<tr><td colspan="6"><div class="state-box"><i class="bi bi-hourglass-split"></i>Loading logs…</div></td></tr>'
+    );
+
+    apiGet('/logs.php', params)
+      .done(function (data) {
+        if (!data.success) { toast(data.message, 'error'); return; }
+
+        const p = data.pagination;
+        currentOffset = p.offset;
+        $('#stat-total').text(parseInt(p.total).toLocaleString());
+        renderLogs(data.data);
+        renderPagination(p);
+      })
+      .fail(function (xhr) {
+        const msg = xhr.responseJSON ? xhr.responseJSON.message : 'Server error';
+        $('#logs-body').html(
+          '<tr><td colspan="6"><div class="state-box text-danger"><i class="bi bi-exclamation-circle"></i>' + esc(msg) + '</div></td></tr>'
+        );
+        toast('Failed to load logs', 'error');
+      });
+  }
+
+  function renderLogs(rows) {
+    if (!rows.length) {
+      $('#logs-body').html(
+        '<tr><td colspan="6"><div class="state-box"><i class="bi bi-inbox"></i>No logs match the current filters.</div></td></tr>'
+      );
+      return;
+    }
+
+    const html = rows.map(function (r) {
+      const meta = typeof r.metadata === 'object' ? JSON.stringify(r.metadata) : r.metadata;
+      return `<tr>
+        <td class="id-cell">#${r.id}</td>
+        <td><span class="badge badge-user">User ${r.user_id}</span></td>
+        <td><span class="badge badge-action">${esc(r.action)}</span></td>
+        <td><span class="badge badge-ip">${esc(r.ip_address)}</span></td>
+        <td class="meta-cell" title="${esc(meta)}">${esc(meta)}</td>
+        <td style="color:#64748b;font-size:0.75rem;white-space:nowrap;">${esc(r.created_at)}</td>
+      </tr>`;
+    }).join('');
+
+    $('#logs-body').html(html);
+  }
+
+  function renderPagination(p) {
+    const page  = Math.floor(p.offset / p.limit) + 1;
+    const pages = p.pages;
+    const from  = p.offset + 1;
+    const to    = Math.min(p.offset + p.limit, p.total);
+
+    const info = `<small class="text-muted">Showing <strong>${from}–${to}</strong> of <strong>${parseInt(p.total).toLocaleString()}</strong> records</small>`;
+
+    const prev = page <= 1
+      ? `<li class="page-item disabled"><a class="page-link">&#8592; Prev</a></li>`
+      : `<li class="page-item"><a class="page-link" href="#" data-page="${page - 2}">&#8592; Prev</a></li>`;
+
+    const next = page >= pages
+      ? `<li class="page-item disabled"><a class="page-link">Next &#8594;</a></li>`
+      : `<li class="page-item"><a class="page-link" href="#" data-page="${page}">Next &#8594;</a></li>`;
+
+    const counter = `<li class="page-item disabled"><a class="page-link" style="color:#64748b;">Page ${page} / ${pages}</a></li>`;
+
+    $('#logs-pagination').html(`
+      ${info}
+      <nav><ul class="pagination mb-0">${prev}${counter}${next}</ul></nav>
+    `);
+  }
+
+  $(document).on('click', '#logs-pagination .page-link[data-page]', function (e) {
+    e.preventDefault();
+    currentOffset = parseInt($(this).data('page')) * currentLimit;
+    fetchLogs();
+  });
+
+  function clearFilters() {
+    $('#f-user_id, #f-action, #f-date_from, #f-date_to').val('');
+    fetchLogs(true);
+  }
+
+  function exportCsv() {
+    const params = {
+      user_id:   $('#f-user_id').val().trim(),
+      action:    $('#f-action').val().trim(),
+      date_from: $('#f-date_from').val(),
+      date_to:   $('#f-date_to').val(),
+      sort:      $('#f-sort').val(),
+      limit:     500,
+      offset:    0,
+      export:    'csv',
+    };
+    const qs = $.param($.grep(Object.entries(params), function (e) { return e[1] !== ''; }));
+    // Build proper query string
+    const parts = [];
+    $.each(params, function (k, v) { if (v !== '') parts.push(k + '=' + encodeURIComponent(v)); });
+    window.location.href = BASE + '/logs.php?' + parts.join('&');
+    toast('CSV download started');
+  }
+
+  // Button bindings
+  $('#btnRefreshLogs').on('click', function () { fetchLogs(); });
+  $('#btnFilter').on('click', function () { fetchLogs(true); });
+  $('#btnClear').on('click', clearFilters);
+  $('#btnExport').on('click', exportCsv);
+
+  // ── Anomalies ───────────────────────────────────────────────────────────
+  function fetchAnomalies() {
+    $('#anomaly-content').html(
+      '<div class="state-box"><i class="bi bi-hourglass-split"></i>Running anomaly detection…</div>'
+    );
+
+    apiGet('/anomalies.php', {})
+      .done(function (data) {
+        const a = data.data;
+        $('#stat-hf').text(a.summary.high_frequency_count);
+        $('#stat-mip').text(a.summary.multi_ip_count);
+
+        let html = `<div class="rules-bar mb-3">
+          <i class="bi bi-info-circle me-1"></i>
+          <strong>Rules:</strong>
+          ${esc(a.summary.rules.high_frequency)}
+          &nbsp;&bull;&nbsp;
+          ${esc(a.summary.rules.multi_ip)}
+        </div>
+        <div class="row g-3">`;
+
+        // High frequency column
+        html += `<div class="col-12 col-md-6">
+          <div class="d-flex align-items-center mb-2 gap-2">
+            <span class="badge bg-danger">High Frequency</span>
+            <small class="text-muted">${a.high_frequency.length} issue(s)</small>
+          </div>`;
+
+        if (!a.high_frequency.length) {
+          html += `<div class="anomaly-item text-success">
+            <i class="bi bi-check-circle-fill me-2"></i>No high-frequency anomalies detected.
+          </div>`;
+        } else {
+          a.high_frequency.forEach(function (r) {
+            html += `<div class="anomaly-item">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-warn">User ${r.user_id}</span>
+                <strong>${r.action_count} actions</strong> in 1 min window
+              </div>
+              <small class="text-muted font-mono">${esc(r.minute_window)}</small>
+            </div>`;
+          });
+        }
+        html += '</div>';
+
+        // Multi-IP column
+        html += `<div class="col-12 col-md-6">
+          <div class="d-flex align-items-center mb-2 gap-2">
+            <span class="badge bg-purple" style="background:#6d28d9!important">Multi-IP</span>
+            <small class="text-muted">${a.multi_ip.length} issue(s)</small>
+          </div>`;
+
+        if (!a.multi_ip.length) {
+          html += `<div class="anomaly-item text-success">
+            <i class="bi bi-check-circle-fill me-2"></i>No multi-IP anomalies detected.
+          </div>`;
+        } else {
+          a.multi_ip.forEach(function (r) {
+            html += `<div class="anomaly-item">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-purple">User ${r.user_id}</span>
+                <strong>${r.ip_count} different IPs</strong>
+              </div>
+              <small class="text-muted font-mono d-block">${esc(r.ip_addresses)}</small>
+              <small class="text-muted">${esc(r.first_seen)} &rarr; ${esc(r.last_seen)}</small>
+            </div>`;
+          });
+        }
+        html += '</div></div>';
+
+        $('#anomaly-content').html(html);
+      })
+      .fail(function () {
+        $('#anomaly-content').html(
+          '<div class="state-box text-danger"><i class="bi bi-exclamation-circle"></i>Failed to load anomaly data.</div>'
+        );
+        toast('Failed to load anomalies', 'error');
+      });
+  }
+
+  $('#btnRefreshAnomalies').on('click', fetchAnomalies);
+
+  // ── Top Users ───────────────────────────────────────────────────────────
+  function fetchTopUsers() {
+    $('#top-users-content').html(
+      '<div class="state-box"><i class="bi bi-hourglass-split"></i>Loading…</div>'
+    );
+
+    apiGet('/top-users.php', { n: 5 })
+      .done(function (data) {
+        const users = data.data;
+        if (!users.length) {
+          $('#top-users-content').html(
+            '<div class="state-box"><i class="bi bi-inbox"></i>No data available.</div>'
+          );
+          return;
+        }
+
+        $('#stat-topuser').text('User ' + users[0].user_id);
+
+        const maxCount = parseInt(users[0].activity_count) || 1;
+        const colors   = ['primary', 'purple', 'success', 'warning', 'danger'];
+        const bsColors = ['#3b82f6', '#6d28d9', '#22c55e', '#f59e0b', '#ef4444'];
+
+        const html = users.map(function (u, i) {
+          const pct = Math.round((parseInt(u.activity_count) / maxCount) * 100);
+          return `<div class="user-row">
+            <div class="label-row">
+              <span>
+                <span class="rank">#${i + 1}</span>
+                <span class="badge badge-user">User ${u.user_id}</span>
+              </span>
+              <strong style="font-size:0.8rem;">${parseInt(u.activity_count).toLocaleString()} actions</strong>
+            </div>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar"
+                style="width:${pct}%;background:${bsColors[i]};"
+                aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>`;
+        }).join('');
+
+        $('#top-users-content').html(html);
+      })
+      .fail(function () {
+        $('#top-users-content').html(
+          '<div class="state-box text-danger"><i class="bi bi-exclamation-circle"></i>Failed to load data.</div>'
+        );
+        toast('Failed to load top users', 'error');
+      });
+  }
+
+  $('#btnRefreshTopUsers').on('click', fetchTopUsers);
+
+  // ── Utility ─────────────────────────────────────────────────────────────
+  function esc(str) {
+    return $('<div>').text(String(str == null ? '' : str)).html();
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  fetchLogs();
+  fetchAnomalies();
+  fetchTopUsers();
+
+});
+</script>
+
+</body>
+</html>
